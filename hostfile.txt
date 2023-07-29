@@ -1,0 +1,4 @@
+fc-1 slots=8
+fc-2 slots=8
+fc-3 slots=8
+fc-4 slots=8

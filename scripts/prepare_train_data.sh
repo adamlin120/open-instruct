@@ -58,7 +58,7 @@ echo "Splitting the ShareGPT dataset..."
 python scripts/split_sharegpt_conversations.py \
     --in-files data/raw_train/sharegpt/sg_90k_part1_html_cleaned.json data/raw_train/sharegpt/sg_90k_part2_html_cleaned.json \
     --out-file data/raw_train/sharegpt/sharegpt_html_cleaned_and_split.json \
-    --model-name-or-path ../hf_llama_models/7B/
+    --model-name-or-path "meta-llama/Llama-2-70b-chat-hf"
 
 echo "Reformatting the datasets..."
 python open_instruct/reformat_datasets.py --raw_data_dir data/raw_train/ --output_dir data/processed/

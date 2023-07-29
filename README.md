@@ -21,13 +21,21 @@ As part of this work we introduce Tülu, a suite of LLaMa models fully-finetuned
 You can install the required packages by running the following command (after installing pytorch):
 
 ```bash
-pip install -r requirements.txt
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh
+export PATH=/usr/local/cuda-12.1/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:${LD_LIBRARY_PATH}
+echo 'export PATH=/usr/local/cuda-12.1/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:${LD_LIBRARY_PATH}' >> ~/.bashrc
+
+
+conda create -n open-instruct python=3.10
+conda activate open-instruct
+#pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
+pip3 install --upgrade --force-reinstall --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
+pip install -r llama2_requirements.txt && pip install flash-attn --no-build-isolation
 ```
 
-If you just want the dependencies for the weight diff script, use:
-```bash
-pip install -r weight-diff-requirements.txt
-```
 
 ### Model preparation
 

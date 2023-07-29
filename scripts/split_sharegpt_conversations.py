@@ -17,14 +17,13 @@ def make_sample(sample, start_idx, end_idx):
     }
 
 
-tokenizer = max_length = None
-
-
 def split_one_sample(sample):
+    global tokenizer, max_length
     tokenized_lens = []
     conversations = sample["conversations"]
     conversations = conversations[: len(conversations) // 2 * 2]
     for c in conversations:
+        print(tokenizer)
         length = len(tokenizer(c["value"]).input_ids) + 6
         tokenized_lens.append(length)
 
@@ -97,6 +96,7 @@ def main(args):
         args.model_name_or_path,
         padding_side="right",
         use_fast=False,
+        trust_remote=True
     )
     new_content = split_all(content, args.begin, args.end, tokenizer, args.max_length)
     new_content = filter_invalid_roles(new_content)
@@ -106,6 +106,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    global tokenizer, max_length
     parser = argparse.ArgumentParser()
     parser.add_argument("--in-files", nargs="+", type=str)
     parser.add_argument("--out-file", type=str, default="sharegpt_split.json")
@@ -114,4 +115,19 @@ if __name__ == "__main__":
     parser.add_argument("--model-name-or-path", type=str, required=True)
     parser.add_argument("--max-length", type=int, default=2048)
     args = parser.parse_args()
-    main(args)
+    content = []
+    for file in args.in_files:
+        content.extend(json.load(open(file)))
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+        args.model_name_or_path,
+        padding_side="right",
+        use_fast=False,
+        trust_remote=True
+    )
+    new_content = split_all(content, args.begin, args.end, tokenizer, args.max_length)
+    new_content = filter_invalid_roles(new_content)
+
+    print(f"total: {len(content)}, new: {len(new_content)}")
+    json.dump(new_content, open(args.out_file, "w"), indent=2)
+
+

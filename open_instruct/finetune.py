@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+import json
 import argparse
 import logging
 import math
@@ -22,6 +23,7 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     LlamaTokenizer,
+    LlamaTokenizerFast,
     SchedulerType,
     DataCollatorForSeq2Seq,
     get_scheduler,
@@ -213,6 +215,26 @@ def parse_args():
     return args
 
 
+def encode_with_text_completion_format(example, tokenizer, max_seq_length):
+    '''
+    Here we assume each example has 'text' fields.
+    We concatenate prompt and completion and tokenize them together because otherwise prompt will be padded/trancated
+    and it doesn't make sense to follow directly with the completion.
+    '''
+    # if prompt doesn't end with space and completion doesn't start with space, add space
+    example_text = example['text']
+    example_text = example_text + tokenizer.eos_token
+    tokenized_example = tokenizer(example_text, return_tensors='pt', max_length=max_seq_length, truncation=True, padding='max_length')
+    input_ids = tokenized_example.input_ids
+    labels = input_ids.clone()
+    attention_mask = torch.ones_like(input_ids)
+    return {
+        'input_ids': input_ids.flatten(),
+        'labels': labels.flatten(),
+        'attention_mask': attention_mask.flatten(),
+    }
+
+
 def encode_with_prompt_completion_format(example, tokenizer, max_seq_length):
     '''
     Here we assume each example has 'prompt' and 'completion' fields.
@@ -244,7 +266,8 @@ def encode_with_messages_format(example, tokenizer, max_seq_length):
     Here we assume each example has a 'messages' field Each message is a dict with 'role' and 'content' fields.
     We concatenate all messages with the roles as delimiters and tokenize them together.
     '''
-    messages = example['messages']
+    messages = example['zh_messages']
+    messages = json.loads(messages)
     if len(messages) == 0:
         raise ValueError('messages field is empty.')
     
@@ -255,10 +278,12 @@ def encode_with_messages_format(example, tokenizer, max_seq_length):
                 message_text += "<|system|>\n" + message["content"].strip() + "\n"
             elif message["role"] == "user":
                 message_text += "<|user|>\n" + message["content"].strip() + "\n"
-            elif message["role"] == "assistant":
+            elif message["role"] == "assistant" or message["role"] in {"助理", "助教", '助手'}:
                 message_text += "<|assistant|>\n" + message["content"].strip() + tokenizer.eos_token + "\n"
             else:
-                raise ValueError("Invalid role: {}".format(message["role"]))
+                message_text += "<|assistant|>\n" + message["content"].strip() + tokenizer.eos_token + "\n"
+                print("Invalid role: {}".format(message["role"]))
+                # raise ValueError("Invalid role: {}".format(message["role"]))
         return message_text
         
     example_text = _concat_messages(messages).strip()
@@ -314,7 +339,7 @@ def main():
 
     if args.with_tracking:
         accelerator_log_kwargs["log_with"] = args.report_to
-        accelerator_log_kwargs["logging_dir"] = args.output_dir
+        accelerator_log_kwargs["project_dir"] = args.output_dir
 
     accelerator = Accelerator(gradient_accumulation_steps=args.gradient_accumulation_steps, **accelerator_log_kwargs)
 
@@ -348,6 +373,8 @@ def main():
             args.dataset_name,
             args.dataset_config_name,
         )
+        # raw_datasets['train'] = raw_datasets['train'].select(range(1000))
+        # raw_datasets['validation'] = raw_datasets['validation'].select(range(1000))
     else:
         data_files = {}
         dataset_args = {}
@@ -393,7 +420,7 @@ def main():
 
     # no default pad token for llama!
     # here we add all special tokens again, because the default ones are not in the special_tokens_map
-    if isinstance(tokenizer, LlamaTokenizer):
+    if isinstance(tokenizer, LlamaTokenizer) or isinstance(tokenizer, LlamaTokenizerFast):
         num_added_tokens = tokenizer.add_special_tokens({
             "bos_token": "<s>",
             "eos_token": "</s>",
@@ -408,6 +435,8 @@ def main():
         assert num_added_tokens == 1, "GPTNeoXTokenizer should only add one special token - the pad_token."
     elif isinstance(tokenizer, GPT2Tokenizer) and isinstance(model, OPTForCausalLM):
         num_added_tokens = tokenizer.add_special_tokens({'unk_token': '<unk>'})
+    else:
+        raise ValueError(f"Unsupported tokenizer/model combination: {tokenizer.__class__.__name__} and {model.__class__.__name__}")
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -440,6 +469,12 @@ def main():
             tokenizer=tokenizer,
             max_seq_length=args.max_seq_length,
         )
+    elif "text" in raw_datasets["train"].column_names:
+        encode_function = partial(
+            encode_with_text_completion_format,
+            tokenizer=tokenizer,
+            max_seq_length=args.max_seq_length,
+        )
     else:
         raise ValueError("You need to have either 'prompt'&'completion' or 'messages' in your column names.")
     
@@ -465,7 +500,7 @@ def main():
     train_dataloader = DataLoader(
         train_dataset, 
         shuffle=True, 
-        collate_fn=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="longest"),
+        collate_fn=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="max_length"),
         batch_size=args.per_device_train_batch_size
     )
 
@@ -529,7 +564,7 @@ def main():
         experiment_config = vars(args)
         # TensorBoard cannot log Enums, need the raw value
         experiment_config["lr_scheduler_type"] = experiment_config["lr_scheduler_type"].value
-        accelerator.init_trackers("open_instruct", experiment_config)
+        accelerator.init_trackers(os.environ.get("WANDB_PROJECT", "Chinese-LLAMA2"), experiment_config)
 
     # Train!
     total_batch_size = args.per_device_train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
@@ -650,7 +685,7 @@ def main():
             unwrapped_model.save_pretrained(
                 args.output_dir, is_main_process=accelerator.is_main_process, save_function=accelerator.save, state_dict=state_dict
             )
-        
+
 
 
 if __name__ == "__main__":

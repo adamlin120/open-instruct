@@ -21,6 +21,7 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     LlamaTokenizer,
+    LlamaTokenizerFast,
     HfArgumentParser,
     TrainingArguments,
     DataCollatorForSeq2Seq,
@@ -31,7 +32,10 @@ from transformers import (
 )
 from transformers.trainer_utils import get_last_checkpoint
 from safe_save_trainer import SafeSaveTrainer
-from open_instruct.finetune import encode_with_prompt_completion_format, encode_with_messages_format
+from finetune import encode_with_prompt_completion_format, encode_with_messages_format, encode_with_text_completion_format
+from llama_flash_attn_monkey_patch import replace_llama_attn_with_flash_attn
+
+replace_llama_attn_with_flash_attn()
 
 
 logger = logging.getLogger(__name__)
@@ -79,7 +83,7 @@ class ModelArguments:
         },
     )
     torch_dtype: Optional[str] = field(
-        default=None,
+        default="float16",
         metadata={
             "help": (
                 "Override the default `torch.dtype` and load the model under this dtype. If `auto` is passed, the "
@@ -258,14 +262,16 @@ def main():
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
 
+    model.config.use_cache = False
+
     # no default pad token for llama!
     # here we add all special tokens again, because the default ones are not in the special_tokens_map
-    if isinstance(tokenizer, LlamaTokenizer):
+    if isinstance(tokenizer, (LlamaTokenizer, LlamaTokenizerFast)):
         num_added_tokens = tokenizer.add_special_tokens({
             "bos_token": "<s>",
             "eos_token": "</s>",
             "unk_token": "<unk>",
-            "pad_token": "<pad>",
+            "pad_token": "</s>",
         })
         assert num_added_tokens in [0, 1], "LlamaTokenizer should only add one special token - the pad_token, or no tokens if pad token present."
     elif isinstance(tokenizer, GPTNeoXTokenizerFast):
@@ -288,9 +294,15 @@ def main():
             tokenizer=tokenizer,
             max_seq_length=data_args.max_seq_length,
         )
-    elif "messages" in raw_datasets["train"].column_names:
+    elif "messages" in raw_datasets["train"].column_names or "zh_messages" in raw_datasets["train"].column_names:
         encode_function = partial(
             encode_with_messages_format,
+            tokenizer=tokenizer,
+            max_seq_length=data_args.max_seq_length,
+        )
+    elif "text" in raw_datasets["train"].column_names:
+        encode_function = partial(
+            encode_with_text_completion_format,
             tokenizer=tokenizer,
             max_seq_length=data_args.max_seq_length,
         )
@@ -313,7 +325,7 @@ def main():
                 encode_function,
                 batched=False,
             )
-        lm_datasets.set_format(type="pt")
+        lm_datasets.with_format(type="torch")
 
     if training_args.do_train:
         if "train" not in raw_datasets:
@@ -331,7 +343,7 @@ def main():
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         tokenizer=tokenizer,
-        data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model),
+        data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="max_length"),
     )
 
     # Training
