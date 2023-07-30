@@ -8,7 +8,7 @@ TOKENIZER_NAME="meta-llama/Llama-2-7b-hf"
 DATASET_NAME="yentinglin/zh_instruction"
 
 export WANDB_PROJECT="Chinese-LLAMA2"
-export WANDB_TAGS="${MODEL_NAME_STEM},${DATASET_NAME},instruction-tuning,stage3,no-offload"
+export WANDB_TAGS="${MODEL_NAME_STEM},${DATASET_NAME},instruction-tuning,stage3,no-offload,plus_evol"
 
 export WANDB_API_KEY="94f8e06129c90551b50bfc5556e389fc574c2fa3"
 export HUGGING_FACE_HUB_TOKEN="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"
@@ -43,7 +43,7 @@ python -m torch.distributed.run \
     --report_to "all" \
     --preprocessing_num_workers 8 \
     --hub_strategy "all_checkpoints" \
-    --hub_model_id "${MODEL_NAME_STEM}-sft" \
+    --hub_model_id "${MODEL_NAME_STEM}-sft-0730" \
     --hub_private_repo True \
     --push_to_hub True \
     --fsdp "full_shard auto_wrap" \

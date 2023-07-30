@@ -274,16 +274,18 @@ def encode_with_messages_format(example, tokenizer, max_seq_length):
     def _concat_messages(messages):
         message_text = ""
         for message in messages:
-            if message["role"] == "system":
-                message_text += "<|system|>\n" + message["content"].strip() + "\n"
-            elif message["role"] == "user":
-                message_text += "<|user|>\n" + message["content"].strip() + "\n"
-            elif message["role"] == "assistant" or message["role"] in {"助理", "助教", '助手'}:
-                message_text += "<|assistant|>\n" + message["content"].strip() + tokenizer.eos_token + "\n"
+            role = message.get("role", None) or message.get("from", None)
+            content = message.get("content", message.get("value", "")).strip()
+            message["role"] = role
+            message["content"] = content
+            if role in {"system"}:
+                message_text += "<|system|>\n" + content + "\n"
+            elif role in {"user", 'human'}:
+                message_text += "<|user|>\n" + content + "\n"
+            elif role in {'assistant', "助理", "助教", '助手', 'gpt', 'openai'}:
+                message_text += "<|assistant|>\n" + content + tokenizer.eos_token + "\n"
             else:
-                message_text += "<|assistant|>\n" + message["content"].strip() + tokenizer.eos_token + "\n"
-                print("Invalid role: {}".format(message["role"]))
-                # raise ValueError("Invalid role: {}".format(message["role"]))
+                raise ValueError("Invalid role: {}".format(role))
         return message_text
         
     example_text = _concat_messages(messages).strip()
