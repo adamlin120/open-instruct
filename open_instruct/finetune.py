@@ -280,7 +280,7 @@ def encode_with_messages_format(example, tokenizer, max_seq_length):
             message["content"] = content
             if role in {"system"}:
                 message_text += "<|system|>\n" + content + "\n"
-            elif role in {"user", 'human'}:
+            elif role in {"user", 'human', '使用者'}:
                 message_text += "<|user|>\n" + content + "\n"
             elif role in {'assistant', "助理", "助教", '助手', 'gpt', 'openai'}:
                 message_text += "<|assistant|>\n" + content + tokenizer.eos_token + "\n"
@@ -289,9 +289,11 @@ def encode_with_messages_format(example, tokenizer, max_seq_length):
         return message_text
         
     example_text = _concat_messages(messages).strip()
-    tokenized_example = tokenizer(example_text, return_tensors='pt', max_length=max_seq_length, truncation=True)
+    tokenized_example = tokenizer(example_text, return_tensors='pt', max_length=max_seq_length, truncation=True, padding='max_length')
     input_ids = tokenized_example.input_ids
     labels = input_ids.clone()
+    attention_mask = tokenized_example.attention_mask
+    labels[labels == tokenizer.pad_token_id] = -100
 
     # mask the non-assistant part for avoiding loss
     for message_idx, message in enumerate(messages):
@@ -318,7 +320,7 @@ def encode_with_messages_format(example, tokenizer, max_seq_length):
             if message_end_idx >= max_seq_length:
                 break
 
-    attention_mask = torch.ones_like(input_ids)
+    # attention_mask = torch.ones_like(input_ids)
     return {
         'input_ids': input_ids.flatten(),
         'labels': labels.flatten(),
@@ -502,7 +504,7 @@ def main():
     train_dataloader = DataLoader(
         train_dataset, 
         shuffle=True, 
-        collate_fn=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="max_length"),
+        collate_fn=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model),
         batch_size=args.per_device_train_batch_size
     )
 

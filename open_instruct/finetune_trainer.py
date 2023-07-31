@@ -343,7 +343,7 @@ def main():
         args=training_args,
         train_dataset=train_dataset if training_args.do_train else None,
         tokenizer=tokenizer,
-        data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, padding="max_length"),
+        data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model),
     )
 
     # Training
