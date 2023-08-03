@@ -22,7 +22,7 @@ unidic-lite
 einops
 packaging
 ninja
-# pip install flash-attn==2.0.0.post1 --no-build-isolation
+# pip install flash-attn --no-build-isolation
 # flash-attn==2.0.0.post1
 fire
 scipy
