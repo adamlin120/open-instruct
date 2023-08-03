@@ -103,11 +103,17 @@ tokenizer.pad_token = tokenizer.eos_token
 
 # Step 2: Load the dataset
 ptt = load_dataset("yentinglin/ptt-corpus", split='train')
+ptt = ptt.map(lambda x: {'text': x['text']})
 dcard = load_dataset("yentinglin/dcard-corpus", split='train')
+dcard = dcard.map(lambda x: {'text': x['text']})
 mag = load_dataset("yentinglin/tw-magazine", split='train')
+mag = mag.map(lambda x: {'text': x['text']})
 zh_c4 = load_dataset("yentinglin/zh_TW_c4", split='train')
+zh_c4 = zh_c4.map(lambda x: {'text': x['text']})
 zh_wiki = load_dataset("yentinglin/zh_wiki", split='train')
+zh_wiki = zh_wiki.map(lambda x: {'text': x['text']})
 tw_news = load_dataset("yentinglin/tw_news", split='train')
+tw_news = tw_news.map(lambda x: {'text': x['text']})
 
 dataset = concatenate_datasets([ptt, dcard, mag, zh_c4, zh_wiki, tw_news])
 dataset = dataset.shuffle(seed=42)  # Shuffle the dataset
