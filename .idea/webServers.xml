@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5e416a8c-9681-4efa-a8ee-e362600c119d" name="ec1-1">
+        <fileTransfer rootFolder="/home/ubuntu" accessType="SFTP" host="ec1-1" port="22" sshConfigId="7eff6bfd-47cd-4be8-8342-845c6c9692b9" sshConfig="ubuntu@ec1-1:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="070e4279-3c19-4244-905c-f5beaa58d879" name="west2-2">
+        <fileTransfer rootFolder="/home/ubuntu" accessType="SFTP" host="west2-2" port="22" sshConfigId="3d730b10-bc12-4947-b01c-9c72ef940a89" sshConfig="ubuntu@west2-2:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="abcf17d6-0f6c-4ab2-8a93-440dbab9aded" name="ne1-3">
+        <fileTransfer rootFolder="/home/ubuntu" accessType="SFTP" host="ne1-3" port="22" sshConfigId="b3ca06ca-cc02-4ff8-b5f3-509672d88b06" sshConfig="ubuntu@ne1-3:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

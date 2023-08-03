@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="OPEN_SSH" connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="d8" id="52454801-5390-41b0-9c89-e01116bd6e07" port="2233" nameFormat="DESCRIPTIVE" username="adam" useOpenSSHConfig="true" />
+      <sshConfig authType="OPEN_SSH" host="ec1-1" id="7eff6bfd-47cd-4be8-8342-845c6c9692b9" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+      <sshConfig authType="OPEN_SSH" host="fc-1" id="24159379-86c9-446d-8777-16ed5ed6958b" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+      <sshConfig authType="OPEN_SSH" host="fc-2" id="41e1d275-a593-4639-a0ad-8f82299422eb" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+      <sshConfig authType="OPEN_SSH" host="fc-4" id="2cf368ea-fc14-48de-9b16-cdaa6b851b54" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+      <sshConfig authType="OPEN_SSH" host="west2-2" id="3d730b10-bc12-4947-b01c-9c72ef940a89" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+      <sshConfig authType="OPEN_SSH" host="ne1-3" id="b3ca06ca-cc02-4ff8-b5f3-509672d88b06" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>
