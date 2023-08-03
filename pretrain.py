@@ -88,7 +88,7 @@ model = AutoModelForCausalLM.from_pretrained(
     quantization_config=quantization_config,
     device_map=device_map,
     trust_remote_code=script_args.trust_remote_code,
-    torch_dtype=torch_dtype,
+    torch_dtype=torch.bfloat16,
     use_auth_token=script_args.use_auth_token,
 )
 model.config.use_cache = False
@@ -134,7 +134,7 @@ training_args = TrainingArguments(
     report_to=script_args.log_with,
     # push_to_hub=True,
     # hub_strategy="checkpoint",
-    # hub_private_repo=True,
+    hub_private_repo=True,
     lr_scheduler_type="cosine",
     warmup_ratio=0.03,
     weight_decay=0.0,
@@ -164,6 +164,7 @@ trainer = Trainer(
     dataset_text_field=script_args.dataset_text_field,
     peft_config=peft_config,
     max_seq_length=script_args.seq_length,
+    packing=True
 )
 
 trainer.train()

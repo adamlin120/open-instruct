@@ -187,6 +187,7 @@ trainer = Trainer(
     peft_config=peft_config,
     max_seq_length=script_args.seq_length,
     formatting_func=formatting_func,
+    # TODO: DataCollatorForCompletionOnlyLM in trl v0.5.0
 )
 
 trainer.train()
