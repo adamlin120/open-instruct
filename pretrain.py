@@ -169,4 +169,4 @@ trainer = Trainer(
 trainer.train()
 
 trainer.save_model(script_args.output_dir)
-# trainer.push_to_hub()
+trainer.push_to_hub()
