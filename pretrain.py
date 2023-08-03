@@ -104,17 +104,22 @@ def main():
 
     # Step 2: Load the dataset
     ptt = load_dataset("yentinglin/ptt-corpus", split='train')
-    ptt = ptt.remove_columns(ptt.column_names - ['text'])
+    ptt = ptt.remove_columns([c for c in ptt.column_names if c != 'text'])
+
     dcard = load_dataset("yentinglin/dcard-corpus", split='train')
-    dcard = dcard.remove_columns(dcard.column_names - ['text'])
+    dcard = dcard.remove_columns([c for c in dcard.column_names if c != 'text'])
+
     mag = load_dataset("yentinglin/tw-magazine", split='train')
-    mag = mag.remove_columns(mag.column_names - ['text'])
+    mag = mag.remove_columns([c for c in mag.column_names if c != 'text'])
+
     zh_c4 = load_dataset("yentinglin/zh_TW_c4", split='train')
-    zh_c4 = zh_c4.remove_columns(zh_c4.column_names - ['text'])
+    zh_c4 = zh_c4.remove_columns([c for c in zh_c4.column_names if c != 'text'])
+
     zh_wiki = load_dataset("yentinglin/zh_wiki", split='train')
-    zh_wiki = zh_wiki.remove_columns(zh_wiki.column_names - ['text'])
+    zh_wiki = zh_wiki.remove_columns([c for c in zh_wiki.column_names if c != 'text'])
+
     tw_news = load_dataset("yentinglin/tw_news", split='train')
-    tw_news = tw_news.remove_columns(tw_news.column_names - ['text'])
+    tw_news = tw_news.remove_columns([c for c in tw_news.column_names if c != 'text'])
 
     dataset = concatenate_datasets([ptt, dcard, mag, zh_c4, zh_wiki, tw_news])
     dataset = dataset.shuffle(seed=42)  # Shuffle the dataset
