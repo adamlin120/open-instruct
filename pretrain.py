@@ -113,8 +113,8 @@ def main():
     mag = load_dataset("yentinglin/tw-magazine", split='train')
     mag = mag.remove_columns([c for c in mag.column_names if c != 'text'])
 
-    zh_c4 = load_dataset("yentinglin/zh_TW_c4", split='train')
-    zh_c4 = zh_c4.remove_columns([c for c in zh_c4.column_names if c != 'text'])
+    # zh_c4 = load_dataset("yentinglin/zh_TW_c4", split='train')
+    # zh_c4 = zh_c4.remove_columns([c for c in zh_c4.column_names if c != 'text'])
 
     zh_wiki = load_dataset("yentinglin/zh_wiki", split='train')
     zh_wiki = zh_wiki.remove_columns([c for c in zh_wiki.column_names if c != 'text'])
@@ -122,7 +122,7 @@ def main():
     tw_news = load_dataset("yentinglin/tw_news", split='train')
     tw_news = tw_news.remove_columns([c for c in tw_news.column_names if c != 'text'])
 
-    dataset = concatenate_datasets([ptt, dcard, mag, zh_c4, zh_wiki, tw_news])
+    dataset = concatenate_datasets([ptt, dcard, mag, zh_wiki, tw_news])
     dataset = dataset.shuffle(seed=42)  # Shuffle the dataset
     if script_args.debug:
         dataset = dataset.select(range(int(len(dataset) * 0.0001)))  # Select the first 10%
