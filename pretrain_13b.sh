@@ -4,7 +4,7 @@ NUM_GPUS=8
 BATCH_SIZE_PER_GPU=${1:-1}
 DEBUG=${2:-0}
 
-MODEL_SIZE_ARG=7
+MODEL_SIZE_ARG=13
 MODEL_SIZE="${MODEL_SIZE_ARG}b"
 MODEL_NAME="meta-llama/Llama-2-${MODEL_SIZE}-hf"
 OUTPUT_DIR="zh_llama2_${MODEL_SIZE}_0803"
@@ -24,5 +24,4 @@ python -m torch.distributed.run \
   --output_dir $OUTPUT_DIR \
   --debug $DEBUG \
   --learning_rate 1e-5 \
-  --batch_size $BATCH_SIZE_PER_GPU \
-  --gradient_checkpointing True
+  --batch_size $BATCH_SIZE_PER_GPU

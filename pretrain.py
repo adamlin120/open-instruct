@@ -63,6 +63,7 @@ class ScriptArguments:
     num_train_epochs: Optional[int] = field(default=1, metadata={"help": "the number of training epochs"})
     max_steps: Optional[int] = field(default=-1, metadata={"help": "the number of training steps"})
     debug: Optional[bool] = field(default=False, metadata={"help": "Enable debug mode"})
+    gradient_checkpointing: Optional[bool] = field(default=False, metadata={"help": "Enable gradient checkpointing"})
 
 
 def main():
@@ -153,7 +154,7 @@ def main():
         num_train_epochs=script_args.num_train_epochs,
         max_steps=script_args.max_steps,
         ddp_timeout=18000,
-        gradient_checkpointing=True,
+        gradient_checkpointing=script_args.gradient_checkpointing,
     )
 
     # Step 4: Define the LoraConfig
