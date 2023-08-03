@@ -1,20 +1,8 @@
-# Training Open Instruction-following Language Models
-
-This is the repository for the paper [How Far Can Camels Go? Exploring the State of Instruction Tuning on Open Resources
-](https://arxiv.org/abs/2306.04751).
-
-We explore instruction-tuning popular base models on publicly available datasets. This repository contains:
-1. Training code used for training all models.
-2. Evaluation code for the evaluation done in the paper.
-3. Script for merging and creating model diffs.
-
-As part of this work we introduce Tülu, a suite of LLaMa models fully-finetuned on a strong mix of datasets!
+# Taiwanese Instruction-following Language Models
 
 <p align="center">
 <img src="images/tulu_logo.png" width="200" />
 </p>
-
-**Tülu 65B is the strongest model we build and available [here](https://huggingface.co/allenai/tulu-65b)** - see below for how to make use of this model yourself!
 
 ## Setup
 
@@ -53,7 +41,7 @@ bash pretrain_sft_flash.sh 13 1 0
 ```
 
 
-## Model Checkpoints
+## Demo and Model Checkpoints
 
 We provide a number of model checkpoints as diffs. You can find them on Hugging Face [here](https://huggingface.co/yentinglin). They are also all here:
 
