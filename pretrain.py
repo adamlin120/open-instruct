@@ -142,7 +142,7 @@ def main():
         # gradient_checkpointing=True,
         dataloader_num_workers=1 if script_args.debug else 96,
         save_strategy='steps',
-        save_steps=5 if script_args.debug else 100_000,
+        save_steps=5 if script_args.debug else 10_000,
         save_total_limit=1,
         report_to=script_args.log_with,
         # push_to_hub=True,
