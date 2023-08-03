@@ -33,121 +33,50 @@ conda create -n open-instruct python=3.10
 conda activate open-instruct
 #pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
 pip3 install --upgrade --force-reinstall --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
-pip install -r llama2_requirements.txt && pip install flash-attn --no-build-isolation
+pip install -r llama2_requirements.txt && pip install flash-attn>=2.0.0 --no-build-isolation
 ```
 
-
-### Model preparation
-
-To get LLaMa checkpoints, please acquire them via Meta [here](https://docs.google.com/forms/d/e/1FAIpQLSfqNECQnMkycAp2jP4Z9TFX0cGR4uf7b_fBxjY_OjhJILlKGA/viewform) and consult [the Hugging Face documentation](https://huggingface.co/docs/transformers/model_doc/llama) for converting them to a huggingface-compatible format.
-
-Generally, most huggingface-compatible models should work fine, potentially with some adjusting for different tokenizers etc.
-
-
-## Weight Diff Script
-
-We use a slightly modified form of the [Alpaca weight diff script](https://github.com/tatsu-lab/stanford_alpaca/blob/main/weight_diff.py), which runs the same.
-
-To merge a model:
-1. Download the relevant LLaMa model and convert it to Hugging Face format (see above).
-2. Download our repository and install the right dependencies (see above).
-3. Download the model diff you want.
-4. Run the command below:
-
-```bash
-python scripts/weight_diff.py recover --path_raw ${hf_llama_path} --path_tuned ${output_path} --path_diff ${diff_location}
-```
 
 ## Training
 
-### Dataset Preparation
-
-To download and prepare the instruction datasets we explore, use:
+### Pretrain
 
 ```bash
-./scripts/prepare_train_data.sh
+bash pretrain_sft_flash.sh 13 1 0
 ```
 
-Please check these datasets for licenses and restrictions around their use!
 
-### Finetuning
-To run instruction tuning, you can use the following command:
+### Instruction-tuning
 
 ```bash
-./scripts/finetune_with_accelerate.sh
+./scripts/finetune_with_hf_trainer.sh
 ```
 
-Adjust `model_name_or_path`, `tokenizer_name`, `train_file`, and `output_dir` to your models / data / setting. By default, this uses `deepspeed` with `accelerate`.
 
 ## Model Checkpoints
 
-We provide a number of model checkpoints as diffs. You can find them on Hugging Face [here](https://huggingface.co/models?other=arxiv:2306.04751). They are also all here:
-
-| **Model**                | **7B**                                                                         | **13B**                                                                         | **30B**                                                            | **65B**                                                            |
-|--------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|
-| SuperNI                  | [link](https://huggingface.co/allenai/open-instruct-sni-7b)                    | [link](https://huggingface.co/allenai/open-instruct-sni-13b)                    |                                                                    |                                                                    |
-| CoT                      | [link](https://huggingface.co/allenai/open-instruct-cot-7b)                    | [link](https://huggingface.co/allenai/open-instruct-cot-13b)                    |                                                                    |                                                                    |
-| Flan V2                  | [link](https://huggingface.co/allenai/open-instruct-flan-v2-7b)                | [link](https://huggingface.co/allenai/open-instruct-flan-v2-13b)                |                                                                    |                                                                    |
-| Dolly                    | [link](https://huggingface.co/allenai/open-instruct-dolly-7b)                  | [link](https://huggingface.co/allenai/open-instruct-dolly-13b)                  |                                                                    |                                                                    |
-| Open Assistant 1         | [link](https://huggingface.co/allenai/open-instruct-oasst1-7b)                 | [link](https://huggingface.co/allenai/open-instruct-oasst1-13b)                 |                                                                    |                                                                    |
-| ShareGPT                 | [link](https://huggingface.co/allenai/open-instruct-sharegpt-7b)               | [link](https://huggingface.co/allenai/open-instruct-sharegpt-13b)               | [link](https://huggingface.co/allenai/open-instruct-sharegpt-30b)  | [link](https://huggingface.co/allenai/open-instruct-sharegpt-65b)  |
-| Self-instruct (original) | [link](https://huggingface.co/allenai/open-instruct-self-instruct-7b)          | [link](https://huggingface.co/allenai/open-instruct-self-instruct-13b)          |                                                                    |                                                                    |
-| Unnatural Instructions   | [link](https://huggingface.co/allenai/open-instruct-unnatural-instructions-7b) | [link](https://huggingface.co/allenai/open-instruct-unnatural-instructions-13b) |                                                                    |                                                                    |
-| Alpaca                   | [link](https://huggingface.co/allenai/open-instruct-stanford-alpaca-7b)        | [link](https://huggingface.co/allenai/open-instruct-stanford-alpaca-13b)        |                                                                    |                                                                    |
-| Code-Alpaca              | [link](https://huggingface.co/allenai/open-instruct-code-alpaca-7b)            | [link](https://huggingface.co/allenai/open-instruct-code-alpaca-13b)            |                                                                    |                                                                    |
-| GPT4-Alpaca              | [link](https://huggingface.co/allenai/open-instruct-gpt4-alpaca-7b)            | [link](https://huggingface.co/allenai/open-instruct-gpt4-alpaca-13b)            |                                                                    |                                                                    |
-| Baize                    | [link](https://huggingface.co/allenai/open-instruct-baize-7b)                  | [link](https://huggingface.co/allenai/open-instruct-baize-13b)                  |                                                                    |                                                                    |
-| Human-Mix                | [link](https://huggingface.co/allenai/open-instruct-human-mix-7b)              | [link](https://huggingface.co/allenai/open-instruct-human-mix-13b)              | [link](https://huggingface.co/allenai/open-instruct-human-mix-30b) | [link](https://huggingface.co/allenai/open-instruct-human-mix-65b) |
-| **Tulu**                 | [link](https://huggingface.co/allenai/tulu-7b)                                 | [link](https://huggingface.co/allenai/tulu-13b)                                 | [link](https://huggingface.co/allenai/tulu-30b)                    | [link](https://huggingface.co/allenai/tulu-65b)                    |
-
-We also trained Pythia and OPT models on the Tulu mixture (aka the Human+GPT mixture), and they are available here:
-- [Pythia 6.9B Tulu](https://huggingface.co/allenai/open-instruct-pythia-6.9b-tulu)
-- [OPT 6.7B Tulu](https://huggingface.co/allenai/open-instruct-opt-6.7b-tulu)
-
-## Evaluation
-
-First, run the following script to download all the evaluation datasets:
-
-```bash
-./scripts/prepare_eval_data.sh
-```
-
-Evaluation scripts for different datasets are put under `./scripts`. For example, you can use the following command to run the MMLU evaluation script:
-
-```bash
-./scripts/eval/mmlu.sh
-```
-
-### AlpacaFarm
-
-To run AlpacaFarm eval, please make sure you install our fork of AlpacaFarm (https://github.com/hamishivi/alpaca_farm) and use the following script:
-```bash
-python eval/alpaca_farm_eval.py --model <model> --batch_size 8
-```
-
-Please check the script for more details on the script itself!
-
-### Human Evaluation Interface
-
-Coming soon!
+We provide a number of model checkpoints as diffs. You can find them on Hugging Face [here](https://huggingface.co/yentinglin). They are also all here:
 
 ### Licensing
 
 The is licensed under Apache 2.0 as given in `LICENSE`.
 
-The license we use for the models released (along with the base model licenses) can be found in `model_licenses/tulu_license.txt` - just replace `<MODELNAME>` with the actual model name (i.e., the name on HuggingFace).
-
 # Citation
 
 If you used this repository or our models, please cite our work:
 ```
-@misc{wang2023far,
-      title={How Far Can Camels Go? Exploring the State of Instruction Tuning on Open Resources}, 
-      author={Yizhong Wang and Hamish Ivison and Pradeep Dasigi and Jack Hessel and Tushar Khot and Khyathi Raghavi Chandu and David Wadden and Kelsey MacMillan and Noah A. Smith and Iz Beltagy and Hannaneh Hajishirzi},
-      year={2023},
-      eprint={2306.04751},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+@inproceedings{lin-chen-2023-llm,
+    title = "{LLM}-Eval: Unified Multi-Dimensional Automatic Evaluation for Open-Domain Conversations with Large Language Models",
+    author = "Lin, Yen-Ting  and
+      Chen, Yun-Nung",
+    booktitle = "Proceedings of the 5th Workshop on NLP for Conversational AI (NLP4ConvAI 2023)",
+    month = jul,
+    year = "2023",
+    address = "Toronto, Canada",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.nlp4convai-1.5",
+    pages = "47--58",
+    abstract = "We propose LLM-Eval, a unified multi-dimensional automatic evaluation method for open-domain conversations with large language models (LLMs). Existing evaluation methods often rely on human annotations, ground-truth responses, or multiple LLM prompts, which can be expensive and time-consuming. To address these issues, we design a single prompt-based evaluation method that leverages a unified evaluation schema to cover multiple dimensions of conversation quality in a single model call. We extensively evaluate the performance of LLM-Eval on various benchmark datasets, demonstrating its effectiveness, efficiency, and adaptability compared to state-of-the-art evaluation methods. Our analysis also highlights the importance of choosing suitable LLMs and decoding strategies for accurate evaluation results. LLM-Eval offers a versatile and robust solution for evaluating open-domain conversation systems, streamlining the evaluation process and providing consistent performance across diverse scenarios.",
 }
 ```
 
