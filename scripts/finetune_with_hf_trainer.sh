@@ -1,8 +1,7 @@
 BATCH_SIZE_PER_GPU=1
 NUM_GPUS=8
-GRADIENT_ACC_STEPS=1
 
-MODEL_NAME="yentinglin/zh_llama2_13b"
+MODEL_NAME="yentinglin/zh_TW_LLAMA2"
 MODEL_NAME_STEM=${MODEL_NAME##*/}
 TOKENIZER_NAME="meta-llama/Llama-2-7b-hf"
 DATASET_NAME="yentinglin/zh_instruction"
@@ -14,7 +13,7 @@ export WANDB_API_KEY="94f8e06129c90551b50bfc5556e389fc574c2fa3"
 export HUGGING_FACE_HUB_TOKEN="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"
 
 echo "Training llama2 model: ${MODEL_NAME}"
-echo "using $NUM_GPUS GPUs, $BATCH_SIZE_PER_GPU batch size per GPU, $GRADIENT_ACC_STEPS gradient accumulation steps"
+echo "using $NUM_GPUS GPUs, $BATCH_SIZE_PER_GPU batch size per GPU"
 
 python -m torch.distributed.run \
     --nproc_per_node=$NUM_GPUS \
@@ -26,7 +25,6 @@ python -m torch.distributed.run \
     --max_seq_length 4096 \
     --do_train \
     --per_device_train_batch_size $BATCH_SIZE_PER_GPU \
-    --gradient_accumulation_steps $GRADIENT_ACC_STEPS \
     --learning_rate 1e-5 \
     --lr_scheduler_type cosine \
     --warmup_ratio 0.03 \
@@ -43,7 +41,7 @@ python -m torch.distributed.run \
     --report_to "all" \
     --preprocessing_num_workers 8 \
     --hub_strategy "all_checkpoints" \
-    --hub_model_id "${MODEL_NAME_STEM}-sft-0730" \
+    --hub_model_id "${MODEL_NAME_STEM}-sft-0805" \
     --hub_private_repo True \
     --push_to_hub True \
     --fsdp "full_shard auto_wrap" \
