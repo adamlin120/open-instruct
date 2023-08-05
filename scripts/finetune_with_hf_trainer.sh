@@ -1,5 +1,6 @@
 BATCH_SIZE_PER_GPU=1
 NUM_GPUS=8
+DATE="0805"
 
 MODEL_NAME="yentinglin/zh_TW_LLAMA2"
 MODEL_NAME_STEM=${MODEL_NAME##*/}
@@ -34,17 +35,18 @@ python -m torch.distributed.run \
     --save_strategy epoch \
     --save_total_limit 3 \
     --num_train_epochs 3 \
-    --output_dir output/sft/0729/${MODEL_NAME_STEM}/ \
+    --output_dir output/sft/${DATE}/${MODEL_NAME_STEM}/ \
     --bf16 True \
     --tf32 True \
     --overwrite_output_dir \
     --report_to "all" \
     --preprocessing_num_workers 8 \
     --hub_strategy "all_checkpoints" \
-    --hub_model_id "${MODEL_NAME_STEM}-sft-0805" \
+    --hub_model_id "${MODEL_NAME_STEM}-sft-${DATE}" \
     --hub_private_repo True \
     --push_to_hub True \
     --fsdp "full_shard auto_wrap" \
     --fsdp_transformer_layer_cls_to_wrap 'LlamaDecoderLayer' \
-    --torch_dtype "bfloat16"
+    --torch_dtype "bfloat16" \
+    --gradient_checkpointing True
 
