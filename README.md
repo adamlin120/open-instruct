@@ -17,7 +17,7 @@ echo 'export PATH=/usr/local/cuda-12.1/bin:$PATH' >> ~/.bashrc
 echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:${LD_LIBRARY_PATH}' >> ~/.bashrc
 
 
-conda create -n open-instruct python=3.10
+conda create -n open-instruct python=3.10 -y
 conda activate open-instruct
 #pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
 pip3 install --upgrade --force-reinstall --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 

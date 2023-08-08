@@ -2,6 +2,7 @@ import os
 
 import gradio as gr
 from text_generation import Client
+from conversation import get_default_conv_template, SeparatorStyle
 
 
 eos_token = "</s>"
@@ -23,11 +24,13 @@ endpoint_url = os.environ.get("ENDPOINT_URL")
 client = Client(endpoint_url, timeout=120)
 
 def generate_response(user_input, max_new_token, top_p, top_k, temperature, do_sample, repetition_penalty):
-    msg = _concat_messages([
-        {"role": "system", "content": "你是一個由國立台灣大學的MiuLab實驗室開發的大型語言模型。你基於Transformer架構被訓練，並已經經過大量的台灣中文語料庫的訓練。你的設計目標是理解和生成優雅的繁體中文，並具有跨語境和跨領域的對話能力。使用者可以向你提問任何問題或提出任何話題，並期待從你那裡得到高質量的回答。你應該要盡量幫助使用者解決問題，提供他們需要的資訊，並在適當時候給予建議。"},
-        {"role": "user", "content": user_input},
-    ])
-    msg += "<|assistant|>\n"
+    user_input = user_input.strip()
+    conv = get_default_conv_template("vicuna").copy()
+    roles = {"human": conv.roles[0], "gpt": conv.roles[1]} # map human to USER and gpt to ASSISTANT
+    role = roles["human"]
+    conv.append_message(role, user_input)
+    conv.append_message(roles["gpt"], None)
+    msg = conv.get_prompt()
 
     res = client.generate(
         msg,

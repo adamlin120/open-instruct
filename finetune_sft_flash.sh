@@ -12,6 +12,7 @@ export WANDB_TAGS="${MODEL_NAME_STEM},${DATASET_NAME},instruction-tuning,stage3,
 
 export WANDB_API_KEY="94f8e06129c90551b50bfc5556e389fc574c2fa3"
 export HUGGING_FACE_HUB_TOKEN="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"
+export OMP_NUM_THREADS=1
 
 echo "Training ${MODEL_NAME} using $NUM_GPUS GPUs, $BATCH_SIZE_PER_GPU batch size per GPU"
 
