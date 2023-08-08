@@ -23,6 +23,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="09d9bcf5-51b9-4831-a7e4-cabf646418cf" name="ne1-2">
+        <fileTransfer rootFolder="/home/ubuntu" accessType="SFTP" host="ne1-2" port="22" sshConfigId="d85cb4c4-706b-46af-9d2e-dedbd7b8a44e" sshConfig="ubuntu@ne1-2:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

@@ -75,6 +75,18 @@ def preprocess(
             conv.append_message(role, sentence["value"])
         conversations.append(conv.get_prompt())
 
+    import pandas as pd
+    df = pd.DataFrame(conversations, columns=["text"])
+    # split train and test
+    train_df = df.sample(frac=0.99, random_state=0)
+    test_df = df.drop(train_df.index)
+    # to datasets
+    from datasets import Dataset, DatasetDict
+    train_dataset = Dataset.from_pandas(train_df)
+    test_dataset = Dataset.from_pandas(test_df)
+    dataset = DatasetDict({'train': train_dataset, 'test': test_dataset})
+    # dataset.push_to_hub("yentinglin/zh_instruction_guanaco_style", private=True)
+
     print("Start tokenizing")
     # Tokenize conversations
     input_ids = tokenizer(
