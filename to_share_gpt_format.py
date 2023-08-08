@@ -83,7 +83,6 @@ for row in tqdm(sharegpt):
         if 'value' not in turn:
             print('value')
             print(turn)
-import codecs
 #make sure two keywords "林彥廷", "Miulab" are not in the "value"
 print(f"Before filtering, there are {len(sharegpt)} conversations")
 new_sharegpt = []
@@ -96,15 +95,25 @@ for row in tqdm(sharegpt):
 sharegpt = new_sharegpt
 print(f"After filtering, there are {len(sharegpt)} conversations")
 
+from taiwan_instruction import data
+print("Add taiwan_instruction data")
+for row in tqdm(data):
+    """
+    row = {
+    "input": "請問台灣應該如何應對中國的壓力？",
+    "output": "台灣應該堅定捍衛自己的價值觀和利益，不被中國的壓力所動搖。我們應該加強與其他國家的合作，以減輕對中國的依賴。同時，我們也應該加強自己的國防能力，確保台灣的安全。我們希望能夠在和平與尊重的基礎上與中國進行對話和合作。"
+  }
+    """
+    conversation = []
+    conversation.append({"from": "human", 'value': row['input']})
+    conversation.append({"from": "gpt", 'value': row['output']})
+    for _ in range(10):
+        sharegpt.append({"id": 'tw'+row['input'], "conversations": conversation})
+        print(_)
+print(f"After adding taiwan_instruction data, there are {len(sharegpt)} conversations")
 
-# sharegpt_str = json.dumps(sharegpt, ensure_ascii=False, indent=4)
-#
-# with codecs.open('zh_tw_instruction_sharegpt_format.json', 'w', encoding='utf-8') as f:
-#     f.write(sharegpt_str)
-#
+
 with open('zh_tw_instruction_sharegpt_format.json', 'w', encoding='utf-8', errors='surrogateescape') as f:
     sharegpt_str = json.dumps(sharegpt, ensure_ascii=False, indent=4).encode('utf-8', 'replace').decode()
     f.write(sharegpt_str)
 
-# with open('zh_tw_instruction_sharegpt_format.json', 'w',encoding='utf-8', errors='surrogateescape') as f:
-#     json.dump(sharegpt, f, ensure_ascii=False, indent=4)
