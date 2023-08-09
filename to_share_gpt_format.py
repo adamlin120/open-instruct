@@ -1,4 +1,5 @@
 from datasets import load_dataset
+import random
 import json
 from tqdm import tqdm
 
@@ -109,11 +110,25 @@ for row in tqdm(data):
     conversation.append({"from": "gpt", 'value': row['output']})
     for _ in range(10):
         sharegpt.append({"id": 'tw'+row['input'], "conversations": conversation})
-        print(_)
 print(f"After adding taiwan_instruction data, there are {len(sharegpt)} conversations")
+
+print(f"Add translation data")
+with open("./bi_text.json", 'r', encoding='utf-8') as f:
+    bi_text = json.load(f)
+for id, row in tqdm(bi_text.items()):
+    english = row[0]
+    chinese = row[1]
+    # 50% chance zh-> english
+    if random.random() > 0.5:
+        english, chinese = chinese, english
+
+    conversation = []
+    conversation.append({"from": "human", 'value': chinese})
+    conversation.append({"from": "gpt", 'value': english})
+    sharegpt.append({"id": 'translation_'+id, "conversations": conversation})
+print(f"After adding translation data, there are {len(sharegpt)} conversations")
 
 
 with open('zh_tw_instruction_sharegpt_format.json', 'w', encoding='utf-8', errors='surrogateescape') as f:
     sharegpt_str = json.dumps(sharegpt, ensure_ascii=False, indent=4).encode('utf-8', 'replace').decode()
     f.write(sharegpt_str)
-
