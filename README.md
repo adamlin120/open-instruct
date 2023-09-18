@@ -24,6 +24,22 @@ pip3 install --upgrade --force-reinstall --pre torch --index-url https://downloa
 pip install -r llama2_requirements.txt && pip install flash-attn>=2.0.0 --no-build-isolation
 ```
 
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh
+export PATH=/usr/local/cuda-12.2/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64:${LD_LIBRARY_PATH}
+echo 'export PATH=/usr/local/cuda-12.2/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64:${LD_LIBRARY_PATH}' >> ~/.bashrc
+
+
+conda create -n open-instruct python=3.10 -y
+conda activate open-instruct
+#pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
+pip3 install --upgrade --force-reinstall --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
+pip install -r llama2_requirements.txt && pip install flash-attn==2.2.2 --no-build-isolation
+```
+
 
 ## Training
 
