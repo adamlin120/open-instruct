@@ -36,7 +36,7 @@ echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64:${LD_LIBRARY_PATH}' >> ~
 conda create -n open-instruct python=3.10 -y
 conda activate open-instruct
 #pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
-pip3 install --upgrade --force-reinstall --pre torch --index-url https://download.pytorch.org/whl/nightly/cu121 
+pip3 install --upgrade --force-reinstall --pre "torch<2.2.0" --index-url https://download.pytorch.org/whl/nightly/cu121 
 pip install -r llama2_requirements.txt && pip install flash-attn==2.2.2 --no-build-isolation
 ```
 
